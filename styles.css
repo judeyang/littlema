@@ -675,20 +675,14 @@ body.patterns-off .cell {
   font-weight: 500;
 }
 .tut-ok:active { background: #255bb4; }
-#tut-bottom {
-  display: flex;
-  justify-content: center;
-  margin: 10px auto 0;
-}
+/* 副提示：合并进主气泡内的第二行小字（不再单独放棋盘下方） */
 .tut-sub {
-  background: #fff;
-  border: 1.5px solid #7ea4e0;
-  border-radius: 12px;
-  padding: 8px 16px;
-  font-size: 14px;
-  color: #333;
+  display: none;
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 400;
+  color: #6b7a99;
   text-align: center;
-  box-shadow: 0 3px 10px rgba(30, 60, 120, 0.12);
 }
 .board .cell { position: relative; }
 .tut-ring {

@@ -772,24 +772,20 @@
       this.buildTutorialLayer();
       this.tutorialShowStep();
     },
-    // 引导 UI 全部用文档流/格子内相对定位：气泡插在棋盘正前方（天然在棋盘上方）、
-    // 副提示在棋盘后方、光圈/手指挂进目标格子内部。
+    // 引导 UI 全部用文档流/格子内相对定位：气泡（含主提示+补充说明）插在棋盘正前方
+    // （天然在棋盘上方）、光圈/手指挂进目标格子内部。
     // 不做任何 getBoundingClientRect 坐标计算——预览面板缩放/滚动/iframe 下都不会偏移。
+    // 主提示与副提示合并在同一个气泡内，不再拆成棋盘上下两条。
     buildTutorialLayer() {
       this.tutorialCleanupDom();
       const board = document.getElementById('board');
       if (!board) return;
       const top = document.createElement('div');
       top.id = 'tut-top';
-      top.innerHTML = '<div class="tut-bubble"><span class="tut-text"></span><button class="tut-ok"></button></div>';
-      const bottom = document.createElement('div');
-      bottom.id = 'tut-bottom';
-      bottom.innerHTML = '<div class="tut-sub"></div>';
+      top.innerHTML = '<div class="tut-bubble"><span class="tut-text"></span><span class="tut-sub"></span><button class="tut-ok"></button></div>';
       board.before(top);
-      board.after(bottom);
       top.querySelector('.tut-ok').addEventListener('click', () => this.tutorialNext());
       this.tutorialTop = top;
-      this.tutorialBottom = bottom;
       this.tutorialRing = document.createElement('div');
       this.tutorialRing.className = 'tut-ring';
       this.tutorialHand = document.createElement('div');
@@ -808,7 +804,7 @@
       if (btn) btn.classList.remove('tut-pulse');
     },
     tutorialShowStep() {
-      const top = this.tutorialTop, bottom = this.tutorialBottom;
+      const top = this.tutorialTop;
       if (!top || !this.tut.active) return;
       const step = TUTORIAL_PLAN[this.tut.step];
       if (!step) { this.finishTutorial(); return; }
@@ -818,7 +814,7 @@
       const ok = top.querySelector('.tut-ok');
       ok.style.display = step.button ? 'inline-block' : 'none';
       if (step.button) ok.textContent = step.button;
-      const sub = bottom.querySelector('.tut-sub');
+      const sub = top.querySelector('.tut-sub');
       sub.style.display = step.sub ? 'block' : 'none';
       if (step.sub) sub.innerHTML = step.sub;
       if (step.hintBtn) {
@@ -876,7 +872,6 @@
       try { localStorage.setItem(TUTORIAL_KEY, 'done'); } catch (e) { /* 忽略 */ }
       this.tutorialCleanupDom();
       this.tutorialTop = null;
-      this.tutorialBottom = null;
     },
 
     // ---- 校验谜题合法性 ----
