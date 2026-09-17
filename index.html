@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="4h1sbIWw4W9GhRHT5BM0AV">
+<head data-page-node-id="SDNPeE8qAnqMTnucoFWEUH">
+  <meta charset="UTF-8" data-page-node-id="XjhNYbtbgDIiJ6V12AGv7l">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" data-page-node-id="3N6lnDF7AiyMhddq7R87Qb">
+  <title>小马快跑 · 半对实验室</title>
+  <link rel="stylesheet" href="styles.css" data-page-node-id="RM0tpgNn77PIMhGTAlokKA">
+</head>
+<body data-page-node-id="XMvO1nDiAM1R79NvlNrirD">
+  <div class="app" data-page-node-id="9xow4XnhfFgCZIyEOlvBXq">
+    <!-- 顶部状态栏 -->
+    <header class="topbar" data-page-node-id="qYyvzrNSl0eEU4xwrJJ1fQ">
+      <div class="level-badge" data-page-node-id="ysgOkH2N261EYG2oBtQjTv">
+        <span class="level-icon" data-page-node-id="RMEayEfvPAGAFBb61i5KAD">🎯</span>
+        <span class="level-text" data-page-node-id="TDLh2teV2Z1jAhNvbNl1gf">第 <span id="level-num" data-page-node-id="9QkZ1Yy99R0h2AZHnJawaU">1</span> 关</span>
+      </div>
+      <div class="stars" id="stars" data-page-node-id="H3O3mtkntMImlIOgHt0mmD">
+        <span class="star" data-page-node-id="Z4JntDcHr2suOEZMaUNqBF">★</span>
+        <span class="star" data-page-node-id="fQMA0xEnGMA4nnwmjjtkH8">★</span>
+      </div>
+      <div class="streak" data-page-node-id="BYXoCzaVZQK8LEJ920i23P">
+        <span class="trophy" data-page-node-id="U4hrrvbTQcKzZL8PFeODQp">🏆</span>
+        <span class="streak-text" data-page-node-id="FNRH71p9V294rYMsDjWmCp">连胜 <span id="streak-num" data-page-node-id="5I9Nxf1uyaSYShTGn0jalD">0</span></span>
+      </div>
+    </header>
+
+    <!-- 进度提示 -->
+    <section class="progress-row" data-page-node-id="KmwTDKhbwnWMbL5NIz9ATD">
+      <div class="progress-card" data-page-node-id="qdCO14W1pqjnwWJxzGjwmk">
+        <div class="progress-label" data-page-node-id="sXRUA69I7J9WFtIC3CXWhM">剩余小马</div>
+        <div class="progress-value" data-page-node-id="hi3rmyMa7Gwhbm7i1N8Nb3">
+          <span class="horse-icon" data-page-node-id="hulNvqAdmHjtj1tQ23FHFv">🐴</span>
+          <span id="remaining-horses" data-page-node-id="XKIXwy7cVpKX97AdbCzYB6">5</span>
+        </div>
+      </div>
+      <div class="progress-card" data-page-node-id="cRuvUaOrWRZKJeGTVbh2yT">
+        <div class="progress-label" data-page-node-id="VsuhlUAYdyjUfNXieQm9Ar">已翻开</div>
+        <div class="progress-value" data-page-node-id="ZtukCHvEO2OJJeOWDyOai2">
+          <span class="check-icon" data-page-node-id="L3ctGvAJEKBrsG9wh45wr9">✅</span>
+          <span id="revealed-count" data-page-node-id="kfQ4xySfS52zBwdoDh9RIY">0</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 规则说明 -->
+    <section class="rules" data-page-node-id="e419kIKGA2ENimGq1TrSjf">
+      <div class="rule-item" data-page-node-id="JvNDq0EeUcLWvTsGsvaEZq">
+        <div class="rule-emoji" data-page-node-id="ExWGocFm5yZ4FyI9tBSqeQ">🎨</div>
+        <div class="rule-text" data-page-node-id="uXPHIhjfgsyBvyoWkOUvsm">每种颜色<br data-page-node-id="XWwjqGog4Dq7uSHUDeaGx4">1 匹小马</div>
+      </div>
+      <div class="rule-divider" data-page-node-id="guHnz6HN9hiXIkwsPK4VFu"></div>
+      <div class="rule-item" data-page-node-id="fyd1IJ4IkTo8EgoN7x54A7">
+        <div class="rule-emoji" data-page-node-id="IARTFx2lMrMK0yUx1k6Fek">📐</div>
+        <div class="rule-text" data-page-node-id="nLuQHZfI7MlCA72cS1ycU6">每行每列<br data-page-node-id="RaLKyt7LlF7r2gPTFBPPBV">恰有 1 匹小马</div>
+      </div>
+      <div class="rule-divider" data-page-node-id="OJCQlGMN8U8RFDb49DRnkX"></div>
+      <div class="rule-item" data-page-node-id="InhUJ8W3EYJ54A2AZ4Ga8H">
+        <div class="rule-emoji" data-page-node-id="HvgZ9AJzFf0pyW4FenoBVp">🚫</div>
+        <div class="rule-text" data-page-node-id="Cdnhb8jYL5pUvMNu1iaDQk">小马不能<br data-page-node-id="nbz99HlPKD9LKMBHJsb8UB">相邻（含斜角）</div>
+      </div>
+    </section>
+
+    <!-- 棋盘 -->
+    <main class="board-wrapper" data-page-node-id="DjUNuIvCaOYBhf11Lq87d9">
+      <div id="board" class="board" data-page-node-id="S1DKG869ZCdYEotTYTfLyO"></div>
+    </main>
+
+    <!-- 底部操作栏 -->
+    <footer class="bottombar" data-page-node-id="OvCzAjXr2Frs2nF3ZEi4xb">
+      <button class="action-btn" id="btn-clear" data-page-node-id="HbJAfNbppw7ASephp6bCES">
+        <span class="action-icon" data-page-node-id="oJKPJToSULp3PHtzUGrqe4">🧹</span>
+        <span class="action-label" data-page-node-id="RQz9P3B4l4EdHCRkVKfu7c">清除标记</span>
+      </button>
+      <button class="action-btn primary" id="btn-hint" data-page-node-id="6PnGVWeV5N2bKBDK2MrEQ5">
+        <span class="action-icon" data-page-node-id="39RrNAyGRdSLaXY35evRz5">🔍</span>
+        <span class="action-label" data-page-node-id="QfoNBPmmzlhzwbOYCWd73z">查看提示</span>
+      </button>
+      <button class="action-btn" id="btn-auto" title="玩法说明" data-page-node-id="8CKd0BRecytH6FmOd6xF3b">
+        <span class="action-icon" data-page-node-id="vuEIvV0SCE6isbcE4r0PQc">📖</span>
+        <span class="action-label" data-page-node-id="8YdSo6yFCxFlEovDq2u94H">玩法</span>
+      </button>
+      <button class="action-btn" id="btn-pattern" title="开关区域底纹（帮助区分相近颜色）">
+        <span class="action-icon">▦</span>
+        <span class="action-label" id="pattern-label">底纹 开</span>
+      </button>
+    </footer>
+
+    <!-- 玩家档案选择 -->
+    <div class="modal-overlay" id="profile-modal">
+      <div class="modal-card">
+        <div class="modal-emoji">👤</div>
+        <div class="modal-title">选择玩家</div>
+        <div class="modal-desc">每位玩家独立保存关卡与连胜进度</div>
+        <div class="profile-list" id="profile-list"></div>
+        <div class="profile-new">
+          <input id="profile-input" maxlength="12" placeholder="新玩家名字（1~12 字）" />
+          <button class="modal-btn primary" id="profile-add">创建</button>
+        </div>
+        <div class="modal-buttons">
+          <button class="modal-btn" id="profile-close">取消</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 提示气泡 -->
+    <div class="hint-toast" id="hint-toast" data-page-node-id="XzTqVVrA0XrTGQt13sLjPV"></div>
+
+    <!-- 遮罩层（胜利/失败） -->
+    <div class="modal-overlay" id="modal" data-page-node-id="2R5RZcUzgQXvNe8iVpzRQJ">
+      <div class="modal-card" data-page-node-id="iTSoAoB9bj3dHysmKbTbZt">
+        <div class="modal-emoji" id="modal-emoji" data-page-node-id="Vzm5NHibTHLc3UieX6TAlR">🎉</div>
+        <div class="modal-title" id="modal-title" data-page-node-id="0t56LEW15sXzTaN374iVN2">胜利！</div>
+        <div class="modal-desc" id="modal-desc" data-page-node-id="hvsEv6Ny9KcA73lrX8iYBH">进入下一关</div>
+        <div class="modal-buttons" data-page-node-id="QS18YEg3YbtCVCVzkViPfP">
+          <button class="modal-btn" id="modal-secondary" data-page-node-id="JrHugNqXEMWtYO5fiLBGwD">重玩本关</button>
+          <button class="modal-btn primary" id="modal-primary" data-page-node-id="MMAb5px0SQYgzxhoBbiNNI">继续</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="src/puzzle-core.js"></script>
+  <script src="src/logic-engine.js"></script>
+  <script src="src/hint-presenter.js"></script>
+  <script src="src/progress-store.js"></script>
+  <script src="data/campaign.js"></script>
+  <script src="data/four-region-test.js"></script>
+  <script src="data/four-region-pair-test.js"></script>
+  <script src="src/test-campaign.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
