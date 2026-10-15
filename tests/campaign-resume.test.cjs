@@ -65,6 +65,7 @@ function loadGame(campaign,storage,{key,hash='#demo'}={}){
   context.window=context;
   vm.createContext(context);
   vm.runInContext(progressSource,context);
+  vm.runInContext(fs.readFileSync(path.join(__dirname,'../src/round-challenge.js'),'utf8'),context);
   if(key)context.ProgressStore=context.ProgressStore.create(key);
   context.GameCampaign=campaign;
   vm.runInContext(gameSource,context);

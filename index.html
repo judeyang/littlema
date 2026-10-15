@@ -34,10 +34,11 @@
         </div>
       </div>
       <div class="progress-card" data-page-node-id="cRuvUaOrWRZKJeGTVbh2yT">
-        <div class="progress-label" data-page-node-id="VsuhlUAYdyjUfNXieQm9Ar">已翻开</div>
+        <div class="progress-label" id="timer-label" data-page-node-id="VsuhlUAYdyjUfNXieQm9Ar">教学练习</div>
         <div class="progress-value" data-page-node-id="ZtukCHvEO2OJJeOWDyOai2">
-          <span class="check-icon" data-page-node-id="L3ctGvAJEKBrsG9wh45wr9">✅</span>
-          <span id="revealed-count" data-page-node-id="kfQ4xySfS52zBwdoDh9RIY">0</span>
+          <span class="check-icon" data-page-node-id="L3ctGvAJEKBrsG9wh45wr9">⏱</span>
+          <span id="remaining-time">不限时</span>
+          <span id="revealed-count" hidden data-page-node-id="kfQ4xySfS52zBwdoDh9RIY">0</span>
         </div>
       </div>
     </section>
@@ -74,6 +75,7 @@
       <button class="action-btn primary" id="btn-hint" data-page-node-id="6PnGVWeV5N2bKBDK2MrEQ5">
         <span class="action-icon" data-page-node-id="39RrNAyGRdSLaXY35evRz5">🔍</span>
         <span class="action-label" data-page-node-id="QfoNBPmmzlhzwbOYCWd73z">查看提示</span>
+        <span class="hint-quota" id="hint-quota">不限次数</span>
       </button>
       <button class="action-btn" id="btn-auto" title="玩法说明" data-page-node-id="8CKd0BRecytH6FmOd6xF3b">
         <span class="action-icon" data-page-node-id="vuEIvV0SCE6isbcE4r0PQc">📖</span>
@@ -123,6 +125,7 @@
   <script src="src/logic-engine.js"></script>
   <script src="src/hint-presenter.js"></script>
   <script src="src/progress-store.js"></script>
+  <script src="src/round-challenge.js"></script>
   <script src="data/campaign.js"></script>
   <script src="data/four-region-test.js"></script>
   <script src="data/four-region-pair-test.js"></script>

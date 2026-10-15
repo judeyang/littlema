@@ -6,7 +6,7 @@
 
 ## 工作流
 
-先读 ROADMAP.md 的当前检查点，再读对应 goals/ 清单。README.md 只写当前可运行功能。设计母稿为 docs/difficulty-design.md（实施前同步获批 v1.1）。新能力必须有对应证据，不能把旧文档的“已实现”声明当测试结果。
+先读 ROADMAP.md 的当前检查点，再读对应 goals/ 清单。README.md 只写当前可运行功能。设计母稿为 docs/difficulty-design.md；获批倒计时与提示额度规则在 docs/timed-hints.md。新能力必须有对应证据，不能把旧文档的“已实现”声明当测试结果。
 
 ## 工程边界
 

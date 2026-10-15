@@ -56,7 +56,7 @@
       highlight: [0, 4, 12, 17, 22], allow: { singleExclude: [0, 4, 12, 17, 22] } },
     { id: 'place2', html: '只剩最后的<b class="tut-em">珊瑚红</b>格子了，连点两下放小马吧', highlight: [9], hand: 9,
       allow: { double: [9] } },
-    { id: 'free', html: '最后两匹小马藏哪了，你找到了吗？', sub: '如需提示，请点击此处 &gt;', hintBtn: true, free: true },
+    { id: 'free', html: '剩下的小马藏哪了，你找到了吗？', sub: '现在可以自由操作，如需帮助可点击提示', hintBtn: true, free: true },
   ];
 
   function puzzleFingerprint(puzzle) {
@@ -672,6 +672,17 @@
 
       this.modalPrimary.addEventListener('click',   () => this.onModalPrimary());
       this.modalSecondary.addEventListener('click', () => this.onModalSecondary());
+      document.addEventListener('visibilitychange', () => this.onClockVisibility(Boolean(document.hidden)));
+      window.addEventListener('pagehide', () => {
+        this.settleClock();
+        this._pageHidden = true;
+        this.saveProgress();
+      });
+      window.addEventListener('pageshow', () => {
+        this._pageHidden = false;
+        this._clockLast = Date.now();
+        this.onClockVisibility(Boolean(document.hidden));
+      });
     },
 
     // ---- 底纹开关状态 ----
@@ -683,7 +694,11 @@
 
     // ---- 新一轮 ----
     newRound(options = {}) {
+      if (this._clockTimer) clearInterval(this._clockTimer);
+      this._clockTimer = null;
       this.dismissHint();
+      this.tut = { active: false, step: -1 };
+      this.tutorialCleanupDom();
       this.stars = MAX_MISSES;
       this.candidates.clear();
       this.revealed.clear();
@@ -718,6 +733,11 @@
           this.showingAnswer = true;
         }
       }
+
+      this.challenge = RoundChallenge.create(record, resumed ? options.resume.challenge : undefined);
+      this._clockLast = Date.now();
+      this._clockHidden = typeof document !== 'undefined' && Boolean(document.hidden);
+      this._pageHidden = false;
 
       // 重置交互状态（清掉可能残留的连续标记模式/拖动状态）
       if (this._drag) {
@@ -754,6 +774,56 @@
         try { localStorage.setItem('pony-run-swipe-tip-v1', 'shown'); } catch (e) { /* 忽略 */ }
       }
       this.saveProgress();
+      this.startClock();
+    },
+
+    // 只结算前台实际玩题时间；刷新和回调延迟不补满／不按回调次数计秒。
+    settleClock() {
+      if (!this.challenge) return;
+      const now = Date.now();
+      const paused = this.status !== 'playing' || this._hintOpen || this._clockHidden ||
+        this._pageHidden || this._modalKind === 'hint-limit' || (this.tut && this.tut.active);
+      if (!paused && Number.isFinite(this._clockLast)) {
+        RoundChallenge.advance(this.challenge, Math.max(0, now - this._clockLast));
+      }
+      this._clockLast = now;
+    },
+
+    startClock() {
+      if (typeof setInterval !== 'function' || !this.challenge.policy.seconds || this.status !== 'playing') return;
+      this._clockTimer = setInterval(() => {
+        const before = Math.ceil(this.challenge.remainingMs / 1000);
+        this.settleClock();
+        this.updateChallengeUI();
+        if (before !== Math.ceil(this.challenge.remainingMs / 1000)) this.saveProgress();
+      }, 250);
+    },
+
+    onClockVisibility(hidden) {
+      this.settleClock(); // 切换前按旧状态结算
+      this._clockHidden = hidden;
+      this._clockLast = Date.now();
+      this.updateChallengeUI();
+      this.saveProgress();
+    },
+
+    updateChallengeUI() {
+      if (!this.challenge || typeof document === 'undefined') return;
+      const time = document.getElementById('remaining-time');
+      const label = document.getElementById('timer-label');
+      if (time) {
+        const seconds = Math.ceil(this.challenge.remainingMs / 1000);
+        const paused = this.status === 'playing' && (this._hintOpen || this._clockHidden || this._pageHidden || this._modalKind === 'hint-limit');
+        time.textContent = !this.challenge.policy.seconds ? '不限时' : seconds === 0 ? '已超时' :
+          `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+        time.classList.toggle('time-low', Boolean(this.challenge.policy.seconds && seconds <= 30));
+        if (label) label.textContent = !this.challenge.policy.seconds ? '教学练习' : seconds === 0 ? '可继续解题' : paused ? '计时暂停' : '剩余时间';
+      }
+      const quota = document.getElementById('hint-quota');
+      if (quota) {
+        const remaining = RoundChallenge.remainingHints(this.challenge);
+        quota.textContent = remaining === null ? '不限次数' : `${remaining}／${this.challenge.policy.hintLimit}`;
+      }
     },
 
     wasSwipeTipShown() {
@@ -793,6 +863,7 @@
       this.tutorialHand.textContent = '👆';
     },
     tutorialCleanupDom() {
+      if (typeof document === 'undefined' || !document.querySelector) return;
       for (const sel of ['#tut-top', '#tut-bottom', '#tut-layer']) {
         const el = document.querySelector(sel);
         if (el) el.remove();
@@ -809,7 +880,8 @@
       const step = TUTORIAL_PLAN[this.tut.step];
       if (!step) { this.finishTutorial(); return; }
       const bubble = top.querySelector('.tut-bubble');
-      top.querySelector('.tut-text').innerHTML = step.html;
+      top.querySelector('.tut-text').innerHTML = step.free
+        ? `剩下的 <b class="tut-em">${this.size - this.revealed.size}</b> 匹小马藏哪了，你找到了吗？` : step.html;
       bubble.style.display = 'block';
       const ok = top.querySelector('.tut-ok');
       ok.style.display = step.button ? 'inline-block' : 'none';
@@ -847,6 +919,10 @@
     },
     tutorialTap(idx, isDouble) {
       const step = TUTORIAL_PLAN[this.tut.step];
+      if (step && step.free) {
+        this.finishTutorial();
+        return this.onCellTap(idx, isDouble);
+      }
       if (!step || !step.allow) return;
       if (step.allow.double && isDouble && step.allow.double.includes(idx)) {
         this.revealCell(idx);
@@ -868,6 +944,7 @@
     },
     finishTutorial() {
       if (!this.tut || !this.tut.active) return;
+      this.settleClock();
       this.tut = { active: false, step: -1 };
       try { localStorage.setItem(TUTORIAL_KEY, 'done'); } catch (e) { /* 忽略 */ }
       this.tutorialCleanupDom();
@@ -887,10 +964,12 @@
 
     saveProgress() {
       if (this.status === 'error' || !this.puzzleId || !window.ProgressStore) return;
+      this.settleClock();
       const store = this.profileStore || window.ProgressStore; // 未走 start() 的试玩环境用注入的存储
       store.save({ level: this.level, puzzleId: this.puzzleId, campaignVersion: this.campaignVersion,
         puzzleFingerprint: this.puzzleFingerprint, size: this.size, stars: this.stars, streak: this.streak, status: this.status,
-        revealed: [...this.revealed], missed: [...this.missed], candidates: [...this.candidates] });
+        revealed: [...this.revealed], missed: [...this.missed], candidates: [...this.candidates],
+        ...(this.challenge ? { challenge: RoundChallenge.snapshot(this.challenge) } : {}) });
     },
 
     // ---- 本机多人档案 ----
@@ -964,6 +1043,7 @@
     },
 
     revealCell(idx) {
+      this.settleClock();
       const r = Math.floor(idx / this.size);
       const c = idx % this.size;
       const isHorse = (this.horses[r] === c);
@@ -971,14 +1051,13 @@
       if (isHorse) {
         this.revealed.add(idx);
         this.candidates.delete(idx);
-        this.render();
-
         if (this.revealed.size === this.size) {
           this.status = 'won';
           this.streak++;
           if (this.tut && this.tut.active) this.finishTutorial(); // 引导中通关：收尾并写完成标记
           setTimeout(() => this.showModal('win'), 400);
         }
+        this.render();
       } else {
         this.missed.add(idx);
         this.candidates.delete(idx);
@@ -1029,11 +1108,19 @@
         if (step && step.hintBtn) this.finishTutorial();
       }
       if (this._hintOpen) { this.dismissHint(); return; }
+      this.settleClock();
       const result = this.findHint();
+      const key = RoundChallenge.hintKey(result);
+      if (key && this.challenge && !RoundChallenge.claimHint(this.challenge, key)) {
+        this.showModal('hint-limit');
+        return;
+      }
 
       this.toast(result.message, result.proof ? 0 : 5000);
       this._hintOpen = Boolean(result.proof);
       if (this.btnHint) this.btnHint.setAttribute('aria-expanded', String(this._hintOpen));
+      this.updateChallengeUI();
+      this.saveProgress();
 
       // 高亮相关格子（支持多个）
       const idxs = result.idxs || [result.idx];
@@ -1080,7 +1167,15 @@
 
     // ---- 模态框 ----
     showModal(kind) {
-      if (kind === 'win') {
+      this.settleClock();
+      this._modalKind = kind;
+      if (kind === 'hint-limit') {
+        this.modalEmoji.textContent = '🔍';
+        this.modalTitle.textContent = '本次提示已用完';
+        this.modalDesc.textContent = '可以继续推理。重玩会清除本次标记和已放的小马，并恢复时间与提示次数。';
+        this.modalPrimary.textContent = '重玩本关';
+        this.modalSecondary.textContent = '继续推理';
+      } else if (kind === 'win') {
         const nextRecord = getCampaignRecord(this.level + 1);
         this.modalEmoji.textContent = '🎉';
         this.modalTitle.textContent = '胜利！';
@@ -1097,10 +1192,15 @@
         this.modalSecondary.textContent = '返回第 1 关';
       }
       this.modal.classList.add('show');
+      this.updateChallengeUI();
+      this.saveProgress();
     },
 
     hideModal() {
+      this.settleClock();
+      this._modalKind = null;
       this.modal.classList.remove('show');
+      this.updateChallengeUI();
     },
 
     onModalPrimary() {
@@ -1119,6 +1219,11 @@
     },
 
     onModalSecondary() {
+      if (this._modalKind === 'hint-limit') {
+        this.hideModal();
+        this.saveProgress();
+        return;
+      }
       if (this.status === 'won') {
         // 重玩本关
         this.newRound();
@@ -1133,11 +1238,14 @@
     // ---- Toast ----
     dismissHint() {
       if (!this._hintOpen) return;
+      this.settleClock();
       this._hintOpen = false;
       clearTimeout(this._toastTimer);
       const el = document.getElementById('hint-toast');
       el.classList.remove('show', 'hint-detail');
       if (this.btnHint) this.btnHint.setAttribute('aria-expanded', 'false');
+      this.updateChallengeUI();
+      this.saveProgress();
     },
 
     toast(msg, duration = 1500) {
@@ -1176,6 +1284,7 @@
       // 棋盘
       this.renderBoard();
       this.tutorialDecorate(); // 引导期：重挂高亮与气泡位置
+      this.updateChallengeUI();
       this.saveProgress();
     },
 
@@ -1386,7 +1495,7 @@
           this._clickTimer = setTimeout(() => {
             this.onCellTap(idx, /*double*/ false);
             this._lastClickedIdx = null;
-          }, 220);
+          }, DOUBLE_MS);
         }
       };
 
@@ -1410,7 +1519,11 @@
     // 拖动经过格子时的统一动作（已翻开/翻错的格子跳过）
     applyDragAction(idx, action) {
       if (this.status !== 'playing') return;
-      if (this.tut && this.tut.active) return; // 引导期禁用拖动批量标记
+      if (this.tut && this.tut.active) {
+        const step = TUTORIAL_PLAN[this.tut.step];
+        if (!step || !step.free) return;
+        this.finishTutorial();
+      }
       if (this.revealed.has(idx) || this.missed.has(idx)) return;
       if (action === 'mark') this.candidates.add(idx);
       else this.candidates.delete(idx);
